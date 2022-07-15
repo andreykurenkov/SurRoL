@@ -1,3 +1,8 @@
+# Alina Chouloute LINXS 2022 Summer Project
+The codebase to get results for benchmarking algorithms for medical surgery tasks.
+
+Builds upon the SurRoL benchmark:
+
 # SurRoL
 
 <p align="center">
