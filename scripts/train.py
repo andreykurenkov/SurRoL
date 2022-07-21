@@ -4,7 +4,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('task')
 parser.add_argument('alg')
 
-args = parser.parser.parse_arg()
+args = parser.parse_args()
 
 if args.alg == 'DDPG':
     model = DDPG('MultiInputPolicy', env, verbose=1, tensorboard_log="./logs/")
