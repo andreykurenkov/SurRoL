@@ -1,8 +1,8 @@
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('task', required = True)
-parser.add_argument('alg', required = True)
+parser.add_argument('task')
+parser.add_argument('alg')
 
 args = parser.parser.parse_arg()
 
