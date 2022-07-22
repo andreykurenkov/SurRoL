@@ -1,4 +1,5 @@
 import argparse
+from stable_baselines3 import DDPG, PPO, HerReplayBuffer, DQN, SAC, TD3
 
 parser = argparse.ArgumentParser()
 parser.add_argument('task')
@@ -20,8 +21,6 @@ elif args.alg == 'HER':
         online_sampling=online_sampling,
         max_episode_length=max_episode_length,
     ),verbose=1, tensorboard_log="./logs/")
-
-from stable_baselines3 import DDPG, PPO, HerReplayBuffer, DQN, SAC, TD3
 
 from surrol.gym import * 
 import gym 
