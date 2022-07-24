@@ -1,5 +1,7 @@
 import argparse
 from stable_baselines3 import DDPG, PPO, HerReplayBuffer, DQN, SAC, TD3
+from surrol.gym import * 
+import gym
 
 parser = argparse.ArgumentParser()
 parser.add_argument('task')
@@ -22,10 +24,7 @@ elif args.alg == 'HER':
         goal_selection_strategy=goal_selection_strategy,
         online_sampling=online_sampling,
         max_episode_length=max_episode_length,
-    ),verbose=1, tensorboard_log="./logs/")
-
-from surrol.gym import * 
-import gym 
+    ),verbose=1, tensorboard_log="./logs/") 
 
 eval_env = gym.make('{args.task}')  # create one process and corresponding env
 model.learn(total_timesteps=int(2e5), 
