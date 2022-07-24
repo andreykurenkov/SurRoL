@@ -7,6 +7,8 @@ parser.add_argument('alg')
 
 args = parser.parse_args()
 
+env = gym.make('{args.task}') # create one process and corresponding env
+
 if args.alg == 'DDPG':
     model = DDPG('MultiInputPolicy', env, verbose=1, tensorboard_log="./logs/")
     # Train the agent
@@ -24,8 +26,6 @@ elif args.alg == 'HER':
 
 from surrol.gym import * 
 import gym 
-
-env = gym.make('{args.task}') # create one process and corresponding env
 
 eval_env = gym.make('{args.task}')  # create one process and corresponding env
 model.learn(total_timesteps=int(2e5), 
