@@ -1,13 +1,14 @@
 import argparse
 from stable_baselines3 import DDPG, PPO, HerReplayBuffer, DQN, SAC, TD3
-from surrol.gym import * 
-import gym
 
 parser = argparse.ArgumentParser()
 parser.add_argument('task')
 parser.add_argument('alg')
 
 args = parser.parse_args()
+
+from surrol.gym import * 
+import gym
 
 env = gym.make('{args.task}') # create one process and corresponding env
 
