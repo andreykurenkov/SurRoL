@@ -1,4 +1,5 @@
 #create log dir
+import os
 log_dir = '/scr-ssd/alina/leval_logs'
 os.makedirs(log_dir, exist_ok=True)
 # Logs will be saved in log_dir/monitor.csv
