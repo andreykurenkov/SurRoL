@@ -2,7 +2,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--name', required = True)
-args = parser.parser.parse_arg()
+args = parser.parse_arg()
 
 from stable_baselines3 import DDPG
 
