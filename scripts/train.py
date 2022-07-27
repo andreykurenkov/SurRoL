@@ -4,6 +4,8 @@ from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from surrol.gym import *
 import gym
+import imageio
+import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument('task')
@@ -55,11 +57,30 @@ eval_env = VecNormalize(eval_env,
                    clip_reward=50.0,
                    gamma=0.98,
                    epsilon=0.001)
-model.learn(total_timesteps=int(2e4),
+model.learn(total_timesteps=int(10000),
     log_interval=10,
     eval_env=eval_env,
     eval_freq=1000,
     n_eval_episodes=10,
     tb_log_name='%s_%s'%(args.alg, args.task),
     eval_log_path="eval_logs/%s_%s"%(args.alg, args.task))
+
+images = []
+obs = env.reset()
+img = env.render(mode='rgb_array')
+
+for i in range(350):
+    print('Step %d'%i)
+    images.append(img)
+    action, _ = model.predict(obs)
+    if (i+1)%50==0:
+        obs = env.reset()
+    else:
+        obs, _, _ ,_ = env.step(action)
+    img = env.render(mode='rgb_array')
+
+gif_path="eval_logs/%s_%s/run.gif"%(args.alg, args.task)
+
+imageio.mimsave(gif_path, [np.array(img) for i, img in enumerate(images) if i%2 == 0], fps=29)
+
 
