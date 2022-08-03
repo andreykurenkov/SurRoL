@@ -119,8 +119,8 @@ class PegTransfer(PsmEnv):
         for i, waypoint in enumerate(self._waypoints):
             if waypoint is None:
                 continue
-            delta_pos = (waypoint[:3] - obs['observation'][:3]) / 0.01 / self.SCALING
-            delta_yaw = (waypoint[3] - obs['observation'][5]).clip(-0.4, 0.4)
+            delta_pos = (waypoint[:3] - obs['observation'][0][:3]) / 0.01 / self.SCALING
+            delta_yaw = (waypoint[3] - obs['observation'][0][5]).clip(-0.4, 0.4)
             if np.abs(delta_pos).max() > 1:
                 delta_pos /= np.abs(delta_pos).max()
             scale_factor = 0.7
@@ -129,7 +129,6 @@ class PegTransfer(PsmEnv):
             if np.linalg.norm(delta_pos) * 0.01 / scale_factor < 2e-3 and np.abs(delta_yaw) < np.deg2rad(2.):
                 self._waypoints[i] = None
             break
-
         return action
 
 

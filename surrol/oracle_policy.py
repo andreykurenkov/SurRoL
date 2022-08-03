@@ -2,9 +2,8 @@ from typing import Any, List, Sequence, Tuple, Union
 
 import numpy as np
 
-from ..argument_utility import ActionScalerArg
-from ..constants import ActionSpace
-from .base import AlgoBase
+from d3rlpy.constants import ActionSpace
+from d3rlpy.algos.base import AlgoBase
 
 
 class OraclePolicy(AlgoBase):
@@ -26,11 +25,10 @@ class OraclePolicy(AlgoBase):
 
     def __init__(
         self,
-        *,
         env,
+        wrapped_env,
         distribution: str = "uniform",
         normal_std: float = 1.0,
-        action_scaler: ActionScalerArg = None,
         **kwargs: Any,
     ):
         super().__init__(
@@ -39,7 +37,6 @@ class OraclePolicy(AlgoBase):
             n_steps=1,
             gamma=0.0,
             scaler=None,
-            action_scaler=action_scaler,
             kwargs=kwargs,
         )
         self._distribution = distribution
@@ -47,6 +44,7 @@ class OraclePolicy(AlgoBase):
         self._action_size = 1
         self._impl = None
         self.env = env
+        self.wrapped_env = wrapped_env
 
     def _create_impl(
         self, observation_shape: Sequence[int], action_size: int
@@ -54,7 +52,10 @@ class OraclePolicy(AlgoBase):
         self._action_size = action_size
 
     def predict(self, x: Union[np.ndarray, List[Any]]) -> np.ndarray:
-        return self.env.get_oracle_action(x)
+        return [np.array(self.env.get_oracle_action(self.wrapped_env.convert_obs_to_dict(x)))]
+
+    def sample_action(self, x: Union[np.ndarray, List[Any]]) -> np.ndarray:
+        return [np.array(self.env.get_oracle_action(self.wrapped_env.convert_obs_to_dict(x)))]
 
     def predict_value(
         self,
