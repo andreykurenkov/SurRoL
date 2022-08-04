@@ -27,6 +27,7 @@ class OraclePolicy(AlgoBase):
         self,
         env,
         wrapped_env,
+        action_noise = None,
         distribution: str = "uniform",
         normal_std: float = 1.0,
         **kwargs: Any,
@@ -45,6 +46,7 @@ class OraclePolicy(AlgoBase):
         self._impl = None
         self.env = env
         self.wrapped_env = wrapped_env
+        self.action_noise = action_noise
 
     def _create_impl(
         self, observation_shape: Sequence[int], action_size: int
@@ -52,10 +54,16 @@ class OraclePolicy(AlgoBase):
         self._action_size = action_size
 
     def predict(self, x: Union[np.ndarray, List[Any]]) -> np.ndarray:
-        return [np.array(self.env.get_oracle_action(self.wrapped_env.convert_obs_to_dict(x)))]
+        action = np.array(self.env.get_oracle_action(self.wrapped_env.convert_obs_to_dict(x)))
+        if self.action_noise != None:
+            action = action + self.action_noise()
+        return [action]
 
     def sample_action(self, x: Union[np.ndarray, List[Any]]) -> np.ndarray:
-        return [np.array(self.env.get_oracle_action(self.wrapped_env.convert_obs_to_dict(x)))]
+        action = np.array(self.env.get_oracle_action(self.wrapped_env.convert_obs_to_dict(x)))
+        if self.action_noise != None:
+            action = action + self.action_noise()
+        return [action]
 
     def predict_value(
         self,

@@ -19,7 +19,7 @@ class HERGoalEnvWrapper(object):
     :param env: (gym.GoalEnv)
     """
 
-    def __init__(self, env):
+    def __init__(self, env, obs_scaler=None):
         super(HERGoalEnvWrapper, self).__init__()
         self.env = env
         self.metadata = self.env.metadata
@@ -28,6 +28,7 @@ class HERGoalEnvWrapper(object):
         # Check that all spaces are of the same type
         # (current limitation of the wrapper)
         space_types = [type(env.observation_space.spaces[key]) for key in KEY_ORDER]
+        self.obs_scaler = obs_scaler
         assert len(set(space_types)) == 1, "The spaces for goal and observation"\
                                            " must be of the same type"
 
@@ -90,13 +91,18 @@ class HERGoalEnvWrapper(object):
 
     def step(self, action):
         obs, reward, done, info = self.env.step(action)
+        if self.obs_scaler is not None:
+            obs = self.obs_scaler(obs)
         return self.convert_dict_to_obs(obs), reward, done, info
 
     def seed(self, seed=None):
         return self.env.seed(seed)
 
     def reset(self):
-        return self.convert_dict_to_obs(self.env.reset())
+        obs = self.convert_dict_to_obs(self.env.reset())
+        if self.obs_scaler is not None:
+            obs = self.obs_scaler(obs)
+        return obs
 
     def compute_reward(self, achieved_goal, desired_goal, info):
         return self.env.compute_reward(achieved_goal, desired_goal, info)

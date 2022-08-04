@@ -19,9 +19,6 @@ args = parser.parse_args()
 dataset = MDPDataset.load("datasets/" + args.dataset_name)
 
 # setup manually
-mean = np.mean(dataset.observations, axis=0, keepdims=True)
-std = np.std(dataset.observations, axis=0, keepdims=True)
-scaler = d3rlpy.preprocessing.StandardScaler(mean=mean, std=std)
 
 env = gym.make(args.task)
 wrapped_env = HERGoalEnvWrapper(env)
