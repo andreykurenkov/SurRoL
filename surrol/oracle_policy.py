@@ -4,21 +4,11 @@ import numpy as np
 
 from d3rlpy.constants import ActionSpace
 from d3rlpy.algos.base import AlgoBase
+from imitation.policies.base import HardCodedPolicy
+import random
 
 
 class OraclePolicy(AlgoBase):
-    r"""Random Policy for continuous control algorithm.
-    This is designed for data collection and lightweight interaction tests.
-    ``fit`` and ``fit_online`` methods will raise exceptions.
-    Args:
-        distribution (str): random distribution. The available options are
-            ``['uniform', 'normal']``.
-        normal_std (float): standard deviation of the normal distribution. This
-            is only used when ``distribution='normal'``.
-        action_scaler (d3rlpy.preprocessing.ActionScaler or str):
-            action preprocessor. The available options are ``['min_max']``.
-    """
-
     _distribution: str
     _normal_std: float
     _action_size: int
@@ -30,6 +20,7 @@ class OraclePolicy(AlgoBase):
         action_noise = None,
         distribution: str = "uniform",
         normal_std: float = 1.0,
+        noise_ratio: float = 0.4,
         **kwargs: Any,
     ):
         super().__init__(
@@ -47,6 +38,7 @@ class OraclePolicy(AlgoBase):
         self.env = env
         self.wrapped_env = wrapped_env
         self.action_noise = action_noise
+        self.noise_ratio = noise_ratio
 
     def _create_impl(
         self, observation_shape: Sequence[int], action_size: int
@@ -54,15 +46,18 @@ class OraclePolicy(AlgoBase):
         self._action_size = action_size
 
     def predict(self, x: Union[np.ndarray, List[Any]]) -> np.ndarray:
-        action = np.array(self.env.get_oracle_action(self.wrapped_env.convert_obs_to_dict(x)))
-        if self.action_noise != None:
-            action = action + self.action_noise()
-        return [action]
+        return self.sample_action(x)
 
     def sample_action(self, x: Union[np.ndarray, List[Any]]) -> np.ndarray:
-        action = np.array(self.env.get_oracle_action(self.wrapped_env.convert_obs_to_dict(x)))
-        if self.action_noise != None:
+        action = np.array(self.env.get_oracle_action(
+                          self.wrapped_env.convert_obs_to_dict(x)))
+        if self.action_noise != None and random.random() < self.noise_ratio:
             action = action + self.action_noise()
+            for i in range(len(action)):
+                if action[i] < -1.0:
+                    action[i] = -1.0
+                if action[i] > 1.0:
+                    action[i] = 1.0
         return [action]
 
     def predict_value(
